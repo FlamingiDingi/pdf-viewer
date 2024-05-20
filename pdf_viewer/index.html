@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Przykład PDF.js</title>
+</head>
+<body>
+  <h1>Wyświetlanie PDF za pomocą PDF.js</h1>
+  <canvas id="pdf-canvas" width="600"></canvas>
+
+  <!-- Dołącz PDF.js -->
+  <script src="pdf.js/pdf.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.js/pdf.worker.js';
+
+    // URL do pliku PDF
+    var url = 'pdfs/pdf1.pdf'; // Zmień 'pdf1.pdf' na nazwę pliku PDF, który chcesz wyświetlić
+
+    // Ładowanie PDF
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc) {
+      console.log('Plik PDF załadowany');
+
+      // Pobieranie pierwszej strony
+      pdfDoc.getPage(1).then(function(page) {
+        console.log('Strona załadowana');
+
+        var scale = 1.5;
+        var viewport = page.getViewport({ scale: scale });
+
+        // Przygotowanie canvas
+        var canvas = document.getElementById('pdf-canvas');
+        var context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Renderowanie strony
+        var renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        page.render(renderContext).promise.then(function() {
+          console.log('Strona wyrenderowana');
+        });
+      });
+    }).catch(function(error) {
+      console.error('Błąd podczas ładowania pliku PDF: ' + error);
+    });
+  </script>
+</body>
+</html>
